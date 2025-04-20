@@ -1,0 +1,17 @@
+name: CI/CD
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v2
+
+      - name: Exemplo de execução
+        run: echo "Fluxo CI/CD funcionando!"
