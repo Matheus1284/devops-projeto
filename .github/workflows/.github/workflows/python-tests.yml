@@ -1,4 +1,4 @@
-name: Run Python Tests
+name: Run Python Tests and Send Discord Alert
 
 on:
   pull_request:
@@ -25,5 +25,20 @@ jobs:
         pip install pytest
 
     - name: Run tests
+      id: run_tests
       run: |
         pytest
+
+    - name: Send Discord Notification
+      if: always()
+      run: |
+        if [ "${{ steps.run_tests.outcome }}" == "success" ]; then
+          MESSAGE="✅ Testes passaram no GitHub Actions!"
+        else
+          MESSAGE="❌ Testes falharam no GitHub Actions!"
+        fi
+
+        curl -H "Content-Type: application/json" \
+          -X POST \
+          -d "{\"content\": \"$MESSAGE\"}" \
+          "${{ secrets.DISCORD_WEBHOOK }}"
