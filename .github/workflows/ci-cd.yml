@@ -20,6 +20,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
       - name: Simular deploy
         run: echo "🚀 Fazendo deploy (CD)"
 
@@ -42,6 +45,7 @@ jobs:
       - name: Rodar testes
         id: run_tests
         run: |
+          export PYTHONPATH=.
           pytest tests/
 
       - name: Enviar notificação para Discord

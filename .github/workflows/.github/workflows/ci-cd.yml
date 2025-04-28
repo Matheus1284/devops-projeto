@@ -14,42 +14,48 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Rodar verificação (CI)
-        run: echo "CI executado com sucesso!"
+        run: echo "✅ CI executado com sucesso!"
 
       - name: Simular deploy (CD)
-        run: echo "Deploy automatizado simulado com sucesso!"
+        run: echo "🚀 Deploy automatizado simulado com sucesso!"
 
   test-and-discord:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout do código
         uses: actions/checkout@v3
 
-      - name: Set up Python
+      - name: Configurar Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
+      - name: Instalar dependências
         run: |
           python -m pip install --upgrade pip
           pip install pytest
 
-      - name: Run tests
+      - name: Rodar testes
         id: run_tests
         run: |
+          export PYTHONPATH=.
           pytest tests/
 
-      - name: Send Discord Notification
+      - name: Enviar notificação para o Discord
         if: always()
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          TEST_RESULT: ${{ steps.run_tests.outcome }}
         run: |
-          if [ "${{ steps.run_tests.outcome }}" == "success" ]; then
+          if [ "$TEST_RESULT" = "success" ]; then
             MESSAGE="✅ Testes passaram no GitHub Actions!"
           else
             MESSAGE="❌ Testes falharam no GitHub Actions!"
           fi
 
+          echo "Enviando mensagem: $MESSAGE"
+
           curl -H "Content-Type: application/json" \
             -X POST \
             -d "{\"content\": \"$MESSAGE\"}" \
-            "${{ secrets.DISCORD_WEBHOOK }}"
+            "$DISCORD_WEBHOOK"
