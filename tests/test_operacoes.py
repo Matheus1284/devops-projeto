@@ -1,4 +1,5 @@
 # tests/test_operacoes.py
+# teste #
 
 from app.operacoes import (
     cadastrar_usuario,
